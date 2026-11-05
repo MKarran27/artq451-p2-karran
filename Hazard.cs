@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Hazard : MonoBehaviour
 {
-    [SerializeField] int damage = 1;   // How much health one hit takes.
+    [SerializeField] int damage = 2;   // How much health one hit takes.
 
     // Keeps running while the player is inside this trigger.
     // Anything else needs a Rigidbody to count.

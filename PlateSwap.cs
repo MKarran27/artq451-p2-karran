@@ -1,3 +1,5 @@
+
+
 using UnityEngine;
 
 public class PlateSwap : MonoBehaviour
@@ -17,7 +19,6 @@ public class PlateSwap : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         if (activated) return;
 
-        activated = true;
         SwapPlayerAndCube();
     }
 
@@ -26,38 +27,48 @@ public class PlateSwap : MonoBehaviour
         if (player == null || cube == null)
         {
             Debug.LogError("Assign Player and Cube in the Inspector!");
-            activated = false;
             return;
         }
+
+        activated = true;
 
         // Save original positions
         Vector3 playerPosition = player.position;
         Vector3 cubePosition = cube.position;
 
-        // Move player to cube's original position
+        // Get Character Controller
         CharacterController controller =
             player.GetComponent<CharacterController>();
 
+        // Disable controller before teleporting
         if (controller != null)
             controller.enabled = false;
 
+        // Move player to cube's original position
         player.position = cubePosition
             + Vector3.up * playerHeightOffset;
 
+        // Re-enable controller
         if (controller != null)
             controller.enabled = true;
 
-        // Move cube to player's original position,
-        // adding height to keep it above the platform
+        // Get cube Rigidbody
         Rigidbody cubeRb = cube.GetComponent<Rigidbody>();
 
+        // Calculate cube's new position
         Vector3 newCubePosition = playerPosition
             + Vector3.up * cubeHeightOffset;
 
         if (cubeRb != null)
         {
-            cubeRb.linearVelocity = Vector3.zero;
-            cubeRb.angularVelocity = Vector3.zero;
+            // Only reset velocity if cube is NOT kinematic
+            if (!cubeRb.isKinematic)
+            {
+                cubeRb.linearVelocity = Vector3.zero;
+                cubeRb.angularVelocity = Vector3.zero;
+            }
+
+            // Move cube
             cubeRb.position = newCubePosition;
         }
         else
@@ -65,6 +76,7 @@ public class PlateSwap : MonoBehaviour
             cube.position = newCubePosition;
         }
 
+        // Update physics
         Physics.SyncTransforms();
 
         Debug.Log("Player and cube swapped positions!");
